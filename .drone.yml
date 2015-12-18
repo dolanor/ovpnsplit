@@ -1,0 +1,6 @@
+build:
+  image: dolanor/golang:nosslverify
+
+  commands:
+    - go get -v
+    - go build
