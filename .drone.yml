@@ -4,3 +4,14 @@ build:
   commands:
     - go get -v
     - go build
+    - mkdir dist
+    - mv ovpnsplit dist/ovpnsplit.x64
+    - GOARCH=386 go build
+    - mv ovpnsplit dist/ovpnsplit.386
+
+publish:
+  github_release:
+    api_key: $$GITHUB_API_KEY
+    files:
+      - dist/*
+
