@@ -6,8 +6,13 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path"
 )
+
+type Lol struct {
+	XMLName xml.Name `xml:"lol"`
+	Content string   `xml:",chardata"`
+	OpenVPNData
+}
 
 type OpenVPNData struct {
 	Key     string `xml:"key"`
@@ -31,24 +36,27 @@ func main() {
 		os.Exit(2)
 	}
 
-	data := OpenVPNData{}
+	data := Lol{}
 	// Ugly hack. Otherwise, not considered as xml valid…
 	filedata = append(append([]byte("<lol>\n"), filedata...), []byte("\n</lol>")...)
 	xml.Unmarshal(filedata, &data)
 
 	if data.Key != "" {
-		ioutil.WriteFile(path.Base(filepath)+".key.pem", []byte(data.Key), 0600)
+		ioutil.WriteFile(filepath+".key.pem", []byte(data.Key), 0600)
 	}
 
 	if data.Cert != "" {
-		ioutil.WriteFile(path.Base(filepath)+".cert.pem", []byte(data.Cert), 0600)
+		ioutil.WriteFile(filepath+".cert.pem", []byte(data.Cert), 0600)
 	}
 
 	if data.Ca != "" {
-		ioutil.WriteFile(path.Base(filepath)+".ca.pem", []byte(data.Ca), 0600)
+		ioutil.WriteFile(filepath+".ca.pem", []byte(data.Ca), 0600)
 	}
 
 	if data.TlsAuth != "" {
-		ioutil.WriteFile(path.Base(filepath)+".tls-auth.pem", []byte(data.TlsAuth), 0600)
+		ioutil.WriteFile(filepath+".tls-auth.pem", []byte(data.TlsAuth), 0600)
 	}
+
+	newnetmanfiledata := append(append(append(append([]byte(data.Content), []byte("\ncert "+filepath+".cert.pem\n")...), []byte("ca "+filepath+".ca.pem\n")...), []byte("key "+filepath+".key.pem\n")...), []byte("tls-auth "+filepath+".tls-auth.pem\n")...)
+	ioutil.WriteFile(filepath+".new.ovpn", newnetmanfiledata, 0600)
 }
