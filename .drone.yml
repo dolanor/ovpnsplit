@@ -15,3 +15,7 @@ publish:
     files:
       - dist/*
 
+deploy:
+  git_push:
+    remote: git@github.com:dolanor/ovpnsplit.git
+    force: false
